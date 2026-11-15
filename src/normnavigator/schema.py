@@ -21,6 +21,10 @@ class Chunk(BaseModel):
     lang: Lang
     article: str = Field(description="Article number as printed, e.g. '18'")
     paragraph: str | None = Field(default=None, description="Paragraph number, e.g. '2'")
+    point: str | None = Field(
+        default=None,
+        description="Point number for articles split by enumerated list (e.g. definitions)",
+    )
     title: str = Field(
         default="", description="Article heading, e.g. 'Obligations of manufacturers'"
     )
@@ -28,9 +32,13 @@ class Chunk(BaseModel):
 
     @property
     def chunk_id(self) -> str:
-        """Unique id, e.g. '2023/1230:de:art18:p2'."""
-        base = f"{self.regulation}:{self.lang}:art{self.article}"
-        return f"{base}:p{self.paragraph}" if self.paragraph else base
+        """Unique id, e.g. '2023/1230:de:art18:p2' or '2024/1689:en:art3:pt12'."""
+        cid = f"{self.regulation}:{self.lang}:art{self.article}"
+        if self.paragraph:
+            cid += f":p{self.paragraph}"
+        if self.point:
+            cid += f":pt{self.point}"
+        return cid
 
     @property
     def article_key(self) -> str:

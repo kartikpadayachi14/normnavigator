@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-11-15T20:43:50.196881+00:00",
+  "regulations": {
+    "2023/1230": {
+      "en": {
+        "source_file": "mr_2023_1230_en.html",
+        "source_sha256": "0d8305c7c66a6a8d14354d4b99706bacb0b976b910ed00c53103eff1557fc6fb",
+        "chunks": 239,
+        "articles": 54,
+        "point_split_chunks": 36,
+        "chars_min": 66,
+        "chars_median": 336,
+        "chars_max": 2910
+      },
+      "de": {
+        "source_file": "mr_2023_1230_de.html",
+        "source_sha256": "104da4a7fc9e05eb8bcbc53151f5f5a9b2782734afd94e16727e1c0a74a148c1",
+        "chunks": 239,
+        "articles": 54,
+        "point_split_chunks": 36,
+        "chars_min": 75,
+        "chars_median": 369,
+        "chars_max": 3516
+      },
+      "parity_only_en": [],
+      "parity_only_de": []
+    },
+    "2024/1689": {
+      "en": {
+        "source_file": "aia_2024_1689_en.html",
+        "source_sha256": "44ee4dd0430e4ba2586b91a1fddbd47d7ad3c76d48464e81293c95a9c6674244",
+        "chunks": 605,
+        "articles": 113,
+        "point_split_chunks": 89,
+        "chars_min": 80,
+        "chars_median": 366,
+        "chars_max": 4704
+      },
+      "de": {
+        "source_file": "aia_2024_1689_de.html",
+        "source_sha256": "d301e512af765c8e5c6ec93ec6be516539b37110ce0b061663b2c93bba8108e3",
+        "chunks": 605,
+        "articles": 113,
+        "point_split_chunks": 89,
+        "chars_min": 88,
+        "chars_median": 405,
+        "chars_max": 5578
+      },
+      "parity_only_en": [],
+      "parity_only_de": []
+    },
+    "2023/988": {
+      "en": {
+        "source_file": "gpsr_2023_988_en.html",
+        "source_sha256": "fef87fea4f9c4828015e6d364c08a5518035445e5f22d0efad0601ad743e640a",
+        "chunks": 223,
+        "articles": 52,
+        "point_split_chunks": 30,
+        "chars_min": 70,
+        "chars_median": 320,
+        "chars_max": 3430
+      },
+      "de": {
+        "source_file": "gpsr_2023_988_de.html",
+        "source_sha256": "a32a3752b0b8716ba1e22787be553e0cd71a10cfa7a104a19d6873f22d204721",
+        "chunks": 223,
+        "articles": 52,
+        "point_split_chunks": 30,
+        "chars_min": 77,
+        "chars_median": 348,
+        "chars_max": 4020
+      },
+      "parity_only_en": [],
+      "parity_only_de": []
+    }
+  },
+  "total_chunks": 2134
+}

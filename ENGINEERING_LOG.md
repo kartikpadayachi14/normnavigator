@@ -47,12 +47,66 @@ ruff check .         -> All checks passed!
 
 ---
 
+## 2026-11-15 — Session 2: EUR-Lex parser + corpus build (Milestone 1, part 2)
+
+**Goal:** Parse the six real source files (3 regulations × DE/EN) into citation-level chunks.
+
+**What was built**
+- Source files supplied by user (saved from EUR-Lex in the browser), copied to `data/raw/` as `{mr_2023_1230,aia_2024_1689,gpsr_2023_988}_{en,de}.html`. SHA-256 of each recorded in `results/corpus_stats.json`.
+- `src/normnavigator/ingest/eurlex.py` — `parse_file()`, `parse_article()`, `block_text()`. [IMPLEMENTED]
+- `schema.Chunk` gained an optional `point` field; ids like `2024/1689:en:art3:pt12`.
+- `scripts/build_corpus.py` — writes `data/processed/chunks.jsonl` and `results/corpus_stats.json`. [MEASURED]
+- `tests/test_eurlex_parser.py` + `tests/fixtures/mini_eurlex.html` (trimmed real structure) — 4 fixture tests (run in CI) + 3 real-file DE/EN parity tests (skipped when raw files are absent, e.g. in CI).
+
+**How the HTML is structured (checked on the real files, not assumed)**
+- Each article: `<div class="eli-subdivision" id="art_N">`, heading `p.oj-ti-art`, title `p.oj-sti-art`.
+- Numbered paragraphs: child `<div id="010.002">` = article 10, paragraph 2.
+- Articles without numbered paragraphs (e.g. AI Act Art. 3 definitions): lead-in `<p>` + one `<table>` per enumerated point.
+- Footnote markers: `.oj-note-tag`; non-breaking spaces after paragraph numbers.
+
+**Decisions and why**
+| Decision | Alternatives | Why |
+|---|---|---|
+| Split long list-articles (>2000 chars) per point, prefix lead-in sentence | Keep whole article; split every list | AI Act Art. 3 has 68 definitions — one chunk would bury every definition; short lists like "Scope (a)(b)" read better whole. Lead-in keeps each point a complete statement ("For the purposes of this Regulation… 'provider' means…") |
+| Join cells of one table row on one line | Plain `get_text()` | Keeps "(a) machinery;" together instead of "(a)\nmachinery;" |
+| Remove footnote markers | Keep | "(7)" markers are noise for BM25 and look like point numbers |
+| Skip annexes for now | Parse them too | Annex structure is irregular; articles are enough for the first evaluation. Machinery Annex III (essential requirements) matters → open issue |
+| Use DE/EN parity as the correctness check | Manual spot checks only | The two texts are official parallel versions, so identical chunk ids in both languages is strong automatic evidence the parser does not drop or merge paragraphs |
+
+**Problems hit**
+- `ModuleNotFoundError: normnavigator` when running scripts. Root cause: src-layout package not installed. Fix: `pip install -e .`.
+- Edit to `schema.py` rejected because ruff had reformatted the file after it was last read. Fix: re-read, re-apply.
+
+**Commands and key outputs**
+```
+python scripts/build_corpus.py  -> wrote 2134 chunks -> data/processed/chunks.jsonl
+pytest -q                       -> 19 passed
+```
+
+**Metrics this session** (source: `results/corpus_stats.json`) [MEASURED]
+| Regulation | Articles | Chunks per language | Point-split chunks | DE/EN parity mismatches |
+|---|---|---|---|---|
+| 2023/1230 Machinery | 54 | 239 | 36 | 0 |
+| 2024/1689 AI Act | 113 | 605 | 89 | 0 |
+| 2023/988 GPSR | 52 | 223 | 30 | 0 |
+| **Total** | 219 | 1067 (2134 both languages) | 155 | 0 |
+
+**Open issues / next steps**
+- Push to GitHub blocked: Claude GitHub App not installed for the repo (push check refused). Needs user action.
+- Annexes not parsed (esp. Machinery Annex III).
+- Longest chunk 5578 chars (AI Act Art. 5(1), DE). Fine for BM25 and bge-m3 (8192-token limit); check if smaller embedding models truncate.
+- Milestone 2: BM25 index, embedding index (model download must run where huggingface.co is reachable), labelled test set.
+
+---
+
 ## RISKS
 
 | Risk | Likelihood | Impact | Mitigation | Status |
 |---|---|---|---|---|
 | Source HTML/models unreachable from dev sandbox | High (happened) | Medium | Run downloads and model inference on user machine or in CI; allowlist domains if plan permits | Open |
-| EUR-Lex HTML structure differs between regulations | Medium | Medium | Write parser against real files; snapshot tests per regulation | Open |
+| EUR-Lex HTML structure differs between regulations | Medium | Medium | Parser written against all six real files; DE/EN parity test per regulation (0 mismatches) | Mitigated |
+| Raw files saved via browser may differ from a script download (consolidated versions, converter versions differ: EN MR 9.15 vs DE 9.16) | Medium | Low | SHA-256 of every source in `results/corpus_stats.json`; parity test catches structural drift | Open |
+| Annexes excluded → questions about essential requirements unanswerable | High | Medium | Test set limited to article content for v1; annex parsing planned | Open |
 | Test set labelled by LLM is biased toward its own retrieval | Medium | High | LLM only drafts; every question + gold article verified by hand; labelling method documented | Open |
 | LLM API cost during evaluation | Medium | Low | Log tokens per call; cache judge outputs; small dev subset | Open |
 | Azure student credits run out / deployment cost | Low | Medium | Container Apps scale-to-zero; small image; teardown script | Open |

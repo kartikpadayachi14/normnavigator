@@ -1,3 +1,5 @@
 # Runtime dependencies — pinned. Added milestone by milestone.
 pydantic==2.14.3
 numpy==2.5.4
+beautifulsoup4==4.15.0
+lxml==6.1.3
