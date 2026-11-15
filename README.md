@@ -1,10 +1,12 @@
 # NormNavigator
 
+[![CI](https://github.com/kartikpadayachi14/normnavigator/actions/workflows/ci.yml/badge.svg)](https://github.com/kartikpadayachi14/normnavigator/actions/workflows/ci.yml)
+
 Bilingual (German/English) agentic RAG assistant for EU product regulations
 (Machinery Regulation 2023/1230, AI Act 2024/1689, General Product Safety Regulation 2023/988),
 with a measured retrieval and answer-quality evaluation.
 
-> Status: **Milestone 1 in progress.** See [ENGINEERING_LOG.md](ENGINEERING_LOG.md).
+> Status: **Milestone 1 done (parser + corpus, 2134 chunks); Milestone 2 (retrieval + evaluation) next.** See [ENGINEERING_LOG.md](ENGINEERING_LOG.md).
 
 ## Architecture (target)
 

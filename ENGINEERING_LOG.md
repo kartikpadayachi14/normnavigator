@@ -99,6 +99,37 @@ pytest -q                       -> 19 passed
 
 ---
 
+## 2026-11-15 — Session 3: first push, CI green, reproducibility check
+
+**Goal:** Get the repo onto GitHub, confirm CI runs, verify Session 2 results reproduce.
+
+**What was done**
+- User created `kartikpadayachi14/normnavigator` and granted the Claude GitHub App access → resolves Session 2 push blocker.
+- Pushed `main` (2 commits). First GitHub Actions run: **success** in 16 s (run 43765426540). [MEASURED]
+- Re-ran `scripts/build_corpus.py` from scratch and diffed `results/corpus_stats.json` against the committed version (ignoring the timestamp): identical. [MEASURED]
+- Removed duplicate copies of the six source files that had been re-copied into `data/raw/` under a second naming scheme (byte-identical by md5; `data/raw/` is gitignored, so nothing committed changed).
+
+**Problems hit**
+- `git push` printed `fatal: expected 'acknowledgments', received 'packfile'` + `push negotiation failed`. Root cause: the push-negotiation optimisation is not supported over this connection; git falls back to a normal push. Push succeeded (`* [new branch] main -> main`). No fix needed.
+
+**Commands and key outputs**
+```
+python scripts/build_corpus.py   -> wrote 2134 chunks (identical stats to Session 2)
+pytest -q                        -> 19 passed
+git push -u origin main          -> * [new branch] main -> main
+gh run list                      -> completed success CI 16s
+```
+
+**Metrics this session:** CI status only. Retrieval metrics: NOT MEASURED.
+
+**Next steps (Milestone 2)**
+1. BM25 retriever (with a German/English-aware tokenizer) + tests.
+2. Embedding retriever (bge-m3 + FAISS). Model download blocked in dev sandbox → index build runs on user machine; the index file is not committed.
+3. Labelled test set: Claude drafts ~120 DE/EN questions with candidate gold articles from the corpus; user verifies each one.
+4. `scripts/eval_retrieval.py` → `results/retrieval_eval.json`: hit@1/5/10, MRR, recall@10 for BM25 / vector / RRF / weighted.
+
+---
+
 ## RISKS
 
 | Risk | Likelihood | Impact | Mitigation | Status |
